@@ -42,6 +42,13 @@ jobs:
       - name: Debug Generated Files
         run: ls -R openAI_testCase_generation/src || echo "No test cases generated"
 
+      - name: Upload Generated Test Cases as Artifact
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-test-cases
+          path: openAI_testCase_generation/src/test/
+
       - name: Commit and Push Changes
         run: |
           if [ -n "$(ls -A openAI_testCase_generation/src/test/ 2>/dev/null)" ]; then
