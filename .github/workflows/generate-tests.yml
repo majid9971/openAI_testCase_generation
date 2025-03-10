@@ -1,13 +1,13 @@
-name: Generate Test Cases
+name: Generate and Commit Test Cases
 
 on:
   push:
     branches:
-      - main  # Change if your default branch is different
-  workflow_dispatch:  # Allows manual trigger
+      - main
+  workflow_dispatch:
 
 jobs:
-  generate_tests:
+  generate-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,29 +19,30 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Dependencies
+      - name: Install Required Python Packages
         run: |
           pip install --upgrade pip
-          pip install openai requests  # Add any other required dependencies
+          pip install openai
 
-      - name: Verify Directory Structure
-        run: ls -R  # Debugging step to check file paths
+      - name: Debug File Structure
+        run: ls -R
 
       - name: Run Test Case Generation Script
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python openAI_testCase_generation/generate_tests.py
 
-      - name: Commit and Push Changes
+      - name: Configure Git
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
 
-          # Check if test files were created/modified
-          if git diff --quiet; then
+      - name: Commit and Push Changes
+        run: |
+          git add openAI_testCase_generation/src/test/*
+          if git diff --staged --quiet; then
             echo "No changes to commit."
           else
-            git add openAI_testCase_generation/src/test/*
             git commit -m "🤖 Auto-generated test cases"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
