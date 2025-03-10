@@ -1,48 +1,55 @@
-name: Generate and Commit Test Cases
+name: Generate Test Cases
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
-  generate-tests:
+  generate_tests:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Debug File Structure
-        run: ls -R  # Prints all files to debug missing files
-
-      - name: Set Up Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
       - name: Install Dependencies
-        run: pip install openai
+        run: |
+          python -m pip install --upgrade pip
+          pip install openai  # Install OpenAI SDK
+
+      - name: Verify OpenAI API Key
+        run: |
+          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
+            echo "❌ ERROR: OPENAI_API_KEY is missing!"
+            exit 1
+          else
+            echo "✅ OpenAI API Key is set."
+          fi
 
       - name: Run Test Case Generation Script
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}  # Fetch API key from GitHub Secrets
-        run: python generate_tests.py
-
-      - name: Configure Git
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
+          python openAI_testCase_generation/generate_tests.py
+
+      - name: Debug Generated Files
+        run: ls -R openAI_testCase_generation/src/test/ || echo "No test cases generated"
 
       - name: Commit and Push Changes
         run: |
-          git add openAI_testCase_generation/src/test/*
-          if git diff --staged --quiet; then
-            echo "No changes to commit."
-          else
+          if [ -n "$(ls -A openAI_testCase_generation/src/test/ 2>/dev/null)" ]; then
+            git config --global user.name "github-actions"
+            git config --global user.email "github-actions@github.com"
+            git add openAI_testCase_generation/src/test/*
             git commit -m "🤖 Auto-generated test cases"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
+          else
+            echo "⚠️ No new test cases to commit"
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
