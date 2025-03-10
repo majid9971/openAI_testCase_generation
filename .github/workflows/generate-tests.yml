@@ -21,8 +21,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install -r requirements.txt  # Ensure dependencies are installed
-          pip install openai  # Ensure OpenAI library is installed
+          pip install --upgrade pip
+          pip install openai requests  # Add any other required dependencies
 
       - name: Verify Directory Structure
         run: ls -R  # Debugging step to check file paths
