@@ -40,7 +40,7 @@ jobs:
           python generate_tests.py
 
       - name: Debug Generated Files
-        run: ls -R openAI_testCase_generation/src/test/ || echo "No test cases generated"
+        run: ls -R openAI_testCase_generation/src || echo "No test cases generated"
 
       - name: Commit and Push Changes
         run: |
