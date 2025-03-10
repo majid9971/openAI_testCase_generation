@@ -28,7 +28,7 @@ jobs:
         run: ls -R
 
       - name: Run Test Case Generation Script
-        run: python openAI_testCase_generation/generate_tests.py
+        run: python generate_tests.py
 
       - name: Configure Git
         run: |
