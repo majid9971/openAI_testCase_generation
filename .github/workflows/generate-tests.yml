@@ -25,7 +25,7 @@ jobs:
       - name: Run test generation script
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python openAI_testCase_generation/generate_tests.py
+        run: python generate_tests.py
 
       - name: Commit and push changes
         env:
