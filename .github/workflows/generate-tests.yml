@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload Generated Test Cases as Artifact
         if: success()
-        uses: actions/upload-artifact@4
+        uses: actions/upload-artifact@4.4
         with:
           name: generated-test-cases
           path: openAI_testCase_generation/src/test/
