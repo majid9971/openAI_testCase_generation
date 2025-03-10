@@ -4,36 +4,32 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  generate-tests:
+  generate_tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.10"
 
-      - name: Install Dependencies
-        run: pip install openai
+      - name: Install dependencies
+        run: pip install --upgrade openai
 
-      - name: Generate Test Cases
+      - name: Run test generation script
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python generate_tests.py
+        run: python openAI_testCase_generation/generate_tests.py
 
-      - name: Commit and Push Test Cases
+      - name: Commit and push changes
         run: |
-          git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add .
-          git commit -m "Auto-generated test cases"
+          git config --global user.name "GitHub Actions"
+          git add openAI_testCase_generation/src/test/*
+          git commit -m "🤖 Auto-generated test cases"
           git push
-        continue-on-error: true
