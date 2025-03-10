@@ -14,20 +14,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Debug File Structure
+        run: ls -R  # Prints all files to debug missing files
+
       - name: Set Up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Install Required Python Packages
-        run: |
-          pip install --upgrade pip
-          pip install openai
-
-      - name: Debug File Structure
-        run: ls -R
+      - name: Install Dependencies
+        run: pip install openai
 
       - name: Run Test Case Generation Script
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}  # Fetch API key from GitHub Secrets
         run: python generate_tests.py
 
       - name: Configure Git
