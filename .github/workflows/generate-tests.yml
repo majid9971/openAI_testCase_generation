@@ -1,16 +1,13 @@
-name: Generate Test Cases with OpenAI
+name: Generate Test Cases
 
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - main  # Change if your default branch is different
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
-  generate-tests:
+  generate_tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,41 +17,31 @@ jobs:
       - name: Set Up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
-          pip install openai
+          pip install -r requirements.txt  # Ensure dependencies are installed
+          pip install openai  # Ensure OpenAI library is installed
+
+      - name: Verify Directory Structure
+        run: ls -R  # Debugging step to check file paths
 
       - name: Run Test Case Generation Script
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python openAI_testCase_generation/generate_tests.py
 
-      - name: Ensure test directory exists
-        run: mkdir -p openAI_testCase_generation/src/test
-
-      - name: Commit and Push Generated Test Cases
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Commit and Push Changes
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
 
-          # Ensure test directory exists
-          mkdir -p openAI_testCase_generation/src/test
-          
-          # Check if test files exist before adding
-          if [ -n "$(ls -A openAI_testCase_generation/src/test/ 2>/dev/null)" ]; then
-            git add openAI_testCase_generation/src/test/*
-          else
-            echo "No test files generated, skipping commit."
-            exit 0
-          fi
-          
-          if git diff --staged --quiet; then
+          # Check if test files were created/modified
+          if git diff --quiet; then
             echo "No changes to commit."
           else
-        
+            git add openAI_testCase_generation/src/test/*
+            git commit -m "🤖 Auto-generated test cases"
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
+          fi
