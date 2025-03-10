@@ -1,9 +1,10 @@
-name: Generate Test Cases
+name: Generate Test Cases using OpenAI
 
 on:
   push:
     branches:
-      - main
+      - main  # Runs when code is pushed to main branch
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
   generate_tests:
@@ -27,9 +28,19 @@ jobs:
         run: python openAI_testCase_generation/generate_tests.py
 
       - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}  # Use this if repo is private
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
+          
           git add openAI_testCase_generation/src/test/*
-          git commit -m "🤖 Auto-generated test cases"
-          git push
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "🤖 Auto-generated test cases"
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git || \
+            git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/shadabmalikshah/openAI_testCase_generation.git
+          fi
