@@ -27,10 +27,20 @@ jobs:
         run: |
           curl -fsSL https://ollama.com/install.sh | sh
 
+      - name: Kill existing Ollama process (if any)
+        run: |
+          if lsof -i :11434 -t > /dev/null 2>&1; then
+            echo "⚠️ Port 11434 is in use. Killing existing Ollama process..."
+            kill -9 $(lsof -i :11434 -t)
+          else
+            echo "✅ Port 11434 is free."
+          fi
+
       - name: Start Ollama
         run: |
-          ollama serve &
+          nohup ollama serve > ollama.log 2>&1 &
           sleep 5
+          cat ollama.log
 
       - name: Pull Llama3 model for Ollama
         run: |
