@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   generate_tests:
@@ -33,42 +33,30 @@ jobs:
             echo "✅ OpenAI API Key is set."
           fi
 
-      - name: Create Test Directory (if not exists)
-        run: mkdir -p openAI_testCase_generation/src/test/
-
       - name: Run Test Case Generation Script
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python generate_tests.py
 
-      - name: Debug Generated Test Cases
+      - name: Debug Generated Files
         run: |
-          ls -R openAI_testCase_generation/src/test/ || echo "❌ No test cases generated"
-
-      - name: Set File Permissions
-        run: |
-          if [ -d "openAI_testCase_generation/src/test/" ]; then
-            chmod -R 755 openAI_testCase_generation/src/test/
-          else
-            echo "⚠️ No test cases found to set permissions"
-          fi
+          ls -R src/test || echo "No test cases generated"
 
       - name: Upload Generated Test Cases as Artifact
-        if: success() && hashFiles('openAI_testCase_generation/src/test/*') != ''
-        uses: actions/upload-artifact@v4.4.0
+        if: success()
+        uses: actions/upload-artifact@v4
         with:
           name: generated-test-cases
-          path: openAI_testCase_generation/src/test/
+          path: src/test/
 
       - name: Commit and Push Changes
         run: |
-          if [ -n "$(ls -A openAI_testCase_generation/src/test/ 2>/dev/null)" ]; then
+          if [ -n "$(ls -A src/test/ 2>/dev/null)" ]; then
             git config --global user.name "github-actions"
             git config --global user.email "github-actions@github.com"
-            git add openAI_testCase_generation/src/test/*
+            git add src/test/*
             git commit -m "🤖 Auto-generated test cases"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
           else
             echo "⚠️ No new test cases to commit"
-          fi
