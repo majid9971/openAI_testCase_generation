@@ -40,7 +40,7 @@ jobs:
           python generate_tests.py
 
       - name: Debug Generated Files
-        run: ls -R /src || echo "No test cases generated"
+        run: ls -R openAI_testCase_generation/src || echo "No test cases generated"
 
       # - name: Upload Generated Test Cases as Artifact
       #   if: success()
