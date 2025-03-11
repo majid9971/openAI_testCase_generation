@@ -41,6 +41,10 @@ jobs:
             sleep 2
           done
 
+      - name: Check Ollama Status
+        run: |
+          sudo systemctl status ollama.service
+
       - name: Generate Tests
         run: python generate_tests.py
 
