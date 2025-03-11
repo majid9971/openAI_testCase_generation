@@ -1,50 +1,40 @@
 import os
 import litellm
 
-# Load API key from environment variable
-API_KEY = os.getenv("OPENAI_API_KEY")
-
-# Function to generate test cases using LiteLLM (OpenAI Compatible)
 def generate_test_code(source_code, language):
-    prompt = f"Generate test cases for the following {language} code:\n\n{source_code}"
-
+    prompt = f"Generate JUnit test cases for the following {language} code:\n\n{source_code}"
+    
+    # Using Ollama with LLaMA2 model (free model)
     response = litellm.completion(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
-        api_key=API_KEY
+        model="ollama/llama2",  # Use free LLaMA2 model
+        messages=[{"role": "user", "content": prompt}]
     )
 
     return response['choices'][0]['message']['content']
 
-# Main function to scan and generate tests
 def scan_and_generate_tests():
-    SRC_DIR = "src/"
-    
-    found_files = False
+    src_dir = "src"
+    test_dir = os.path.join(src_dir, "test")
 
-    for root, _, files in os.walk(SRC_DIR):
-        for file in files:
-            if file.endswith((".java", ".js", ".py")):
-                found_files = True
-                file_path = os.path.join(root, file)
-                language = "Java" if file.endswith(".java") else "JavaScript" if file.endswith(".js") else "Python"
-                
-                with open(file_path, "r", encoding="utf-8") as f:
-                    source_code = f.read()
+    if not os.path.exists(test_dir):
+        os.makedirs(test_dir)
 
-                print(f"Generating tests for {file}...")
-                test_code = generate_test_code(source_code, language)
-                
-                test_file_path = file_path.replace("/src/", "/src/test/").replace(".java", "Test.java").replace(".js", ".test.js").replace(".py", "_test.py")
-                os.makedirs(os.path.dirname(test_file_path), exist_ok=True)
-                
-                with open(test_file_path, "w", encoding="utf-8") as test_file:
-                    test_file.write(test_code)
+    for file_name in os.listdir(src_dir):
+        if file_name.endswith(".java"):
+            file_path = os.path.join(src_dir, file_name)
+            with open(file_path, 'r') as file:
+                source_code = file.read()
 
-    if found_files:
-        print("✅ Test case generation completed.")
-    else:
-        print("❌ No source files found in src/")
+            print(f"📄 Processing {file_name}...")
+            test_code = generate_test_code(source_code, "Java")
+
+            test_file_name = f"Test{file_name}"
+            test_file_path = os.path.join(test_dir, test_file_name)
+
+            with open(test_file_path, 'w') as test_file:
+                test_file.write(test_code)
+
+            print(f"✅ Generated test cases for {file_name} ➡️ {test_file_path}")
 
 if __name__ == "__main__":
     scan_and_generate_tests()
