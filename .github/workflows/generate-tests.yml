@@ -11,47 +11,43 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@v4
+
       - name: Install Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      
+
       - name: Install dependencies
         run: |
-          pip install litellm
-      
+          python -m pip install --upgrade pip
+          pip install requests
+
       - name: Install Ollama
         run: |
           curl -fsSL https://ollama.com/install.sh | sh
-          export PATH="/root/.ollama/bin:$PATH"
-          ollama pull llama2
 
-      - name: Start Ollama Service
+      - name: Start Ollama
         run: |
-          ollama serve --address 0.0.0.0:11434 &
+          ollama serve &
           sleep 5
 
-      - name: Wait for Ollama to Start
+      - name: Pull Llama3 model for Ollama
         run: |
-          for i in {1..10}; do
-            curl -s http://127.0.0.1:11434/v1/models && break
-            echo "Waiting for Ollama to be ready..."
-            sleep 2
-          done
+          ollama pull llama3
 
-      - name: Check Ollama Status
-        run: |
-          sudo systemctl status ollama.service
-
-      - name: Generate Tests
+      - name: Generate test cases
         run: python generate_tests.py
 
-      - name: Check if tests were generated
-        run: ls -R src/test || echo "⚠️ No test cases generated"
+      - name: Check if tests are generated
+        run: |
+          if [ -n "$(ls -A src/test/ 2>/dev/null)" ]; then
+            echo "✅ Test cases generated."
+          else
+            echo "⚠️ No test cases generated."
+          fi
 
-      - name: Commit and push generated tests (if any)
+      - name: Commit and push changes
         if: success()
         run: |
           if [ -n "$(ls -A src/test/ 2>/dev/null)" ]; then
@@ -59,7 +55,7 @@ jobs:
             git config --global user.email "github-actions@github.com"
             git add src/test/*
             git commit -m "🤖 Auto-generated test cases"
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
+            git push https://github.com/shadabmalikshah/openAI_testCase_generation.git
           else
             echo "⚠️ No new test cases to commit"
-          fi 
+          fi
