@@ -39,22 +39,26 @@ jobs:
         run: |
           python generate_tests.py
 
-      - name: Debug Generated Files
-        run: ls -R openAI_testCase_generation/src || echo "No test cases generated"
+      - name: Debug Generated Test Cases
+        run: |
+          ls -R openAI_testCase_generation/src/test/ || echo "❌ No test cases generated"
 
-      # - name: Upload Generated Test Cases as Artifact
-      #   if: success()
-      #   uses: actions/upload-artifact@4.4
-      #   with:
-      #     name: generated-test-cases
-      #     path: openAI_testCase_generation/src/test/
+      - name: Set File Permissions
+        run: chmod -R 755 openAI_testCase_generation/src/test/
+
+      - name: Upload Generated Test Cases as Artifact
+        if: success() && hashFiles('openAI_testCase_generation/src/test/*') != ''
+        uses: actions/upload-artifact@v4.4.0
+        with:
+          name: generated-test-cases
+          path: openAI_testCase_generation/src/test/
 
       - name: Commit and Push Changes
         run: |
           if [ -n "$(ls -A openAI_testCase_generation/src/test/ 2>/dev/null)" ]; then
             git config --global user.name "github-actions"
             git config --global user.email "github-actions@github.com"
-            git add /src/test/*
+            git add openAI_testCase_generation/src/test/*
             git commit -m "🤖 Auto-generated test cases"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
           else
