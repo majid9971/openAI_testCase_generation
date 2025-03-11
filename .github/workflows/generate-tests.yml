@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   generate_tests:
@@ -22,15 +22,15 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install openai  # Install OpenAI SDK
+          pip install litellm
 
-      - name: Verify OpenAI API Key
+      - name: Verify API Key
         run: |
           if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
             echo "❌ ERROR: OPENAI_API_KEY is missing!"
             exit 1
           else
-            echo "✅ OpenAI API Key is set."
+            echo "✅ API Key is set."
           fi
 
       - name: Run Test Case Generation Script
@@ -40,22 +40,21 @@ jobs:
           python generate_tests.py
 
       - name: Debug Generated Files
-        run: |
-          ls -R src/test || echo "No test cases generated"
+        run: ls -R openAI_testCase_generation/src || echo "No test cases generated"
 
       - name: Upload Generated Test Cases as Artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: generated-test-cases
-          path: src/test/
+          path: openAI_testCase_generation/src/test/
 
       - name: Commit and Push Changes
         run: |
-          if [ -n "$(ls -A src/test/ 2>/dev/null)" ]; then
+          if [ -n "$(ls -A openAI_testCase_generation/src/test/ 2>/dev/null)" ]; then
             git config --global user.name "github-actions"
             git config --global user.email "github-actions@github.com"
-            git add src/test/*
+            git add openAI_testCase_generation/src/test/*
             git commit -m "🤖 Auto-generated test cases"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
           else
