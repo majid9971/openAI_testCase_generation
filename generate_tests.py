@@ -9,16 +9,16 @@ def generate_test_code(source_code, language):
     prompt = f"Generate test cases for the following {language} code:\n\n{source_code}"
 
     response = litellm.completion(
-        model="gpt-3.5-turbo",  # Free model available through LiteLLM
+        model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
-        api_key=API_KEY  # LiteLLM proxy key (if needed)
+        api_key=API_KEY
     )
 
     return response['choices'][0]['message']['content']
 
 # Main function to scan and generate tests
 def scan_and_generate_tests():
-    SRC_DIR = "openAI_testCase_generation/src/"
+    SRC_DIR = "src/"
     
     found_files = False
 
