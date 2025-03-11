@@ -9,7 +9,7 @@ def generate_test_code(source_code, language):
     prompt = f"Generate test cases for the following {language} code:\n\n{source_code}"
 
     response = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}]
     )
 
