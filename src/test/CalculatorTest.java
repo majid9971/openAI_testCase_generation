@@ -1,43 +1,45 @@
-Here are some test cases for the `Calculator` class:
+Here are some test cases for the Calculator class:
 
-**Test Case 1: Adding two positive integers**
-* Input: `add(2, 3)`
+**Test Case 1: Simple Addition**
+
+* Input: `Calculator.add(2, 3)`
 * Expected Output: `5`
-* Test Result: Pass
+* Reasoning: This is a basic addition operation that should work as expected.
 
-**Test Case 2: Subtracting a larger number from a smaller number**
-* Input: `subtract(5, 2)`
-* Expected Output: `3`
-* Test Result: Pass
+**Test Case 2: Simple Subtraction**
 
-**Test Case 3: Multiplying two positive integers**
-* Input: `multiply(4, 5)`
-* Expected Output: `20`
-* Test Result: Pass
+* Input: `Calculator.subtract(4, 2)`
+* Expected Output: `2`
+* Reasoning: Another basic arithmetic operation that should work as expected.
 
-**Test Case 4: Dividing a number by zero (expected to throw ArithmeticException)**
-* Input: `divide(10, 0)`
+**Test Case 3: Simple Multiplication**
+
+* Input: `Calculator.multiply(5, 6)`
+* Expected Output: `30`
+* Reasoning: This is a basic multiplication operation that should work as expected.
+
+**Test Case 4: Division by Zero (Expected Exception)**
+
+* Input: `Calculator.divide(10, 0)`
 * Expected Exception: `ArithmeticException("Cannot divide by zero")`
-* Test Result: Pass
+* Reasoning: The code specifically checks for division by zero and throws an exception. We're testing this scenario to ensure the correct behavior.
 
-**Test Case 5: Adding two negative integers**
-* Input: `add(-2, -3)`
+**Test Case 5: Positive Division**
+
+* Input: `Calculator.divide(12, 3)`
+* Expected Output: `4`
+* Reasoning: This is a positive division operation that should work as expected.
+
+**Test Case 6: Negative Division**
+
+* Input: `Calculator.divide(-10, 2)`
 * Expected Output: `-5`
-* Test Result: Pass
+* Reasoning: We're testing the case where one of the inputs is negative. The result should be negative as well.
 
-**Test Case 6: Subtracting a smaller number from a larger negative integer**
-* Input: `subtract(-5, -2)`
-* Expected Output: `-3`
-* Test Result: Pass
+**Test Case 7: Large Numbers (Overflow)**
 
-**Test Case 7: Multiplying two negative integers**
-* Input: `multiply(-4, -5)`
-* Expected Output: `20`
-* Test Result: Pass
+* Input: `Calculator.add(Integer.MAX_VALUE, Integer.MAX_VALUE)` or similar
+* Expected Exception: `ArithmeticException("Result too large")`
+* Reasoning: Java has limits on integer values. We're testing the case where the result would exceed these limits, expecting an exception.
 
-**Test Case 8: Dividing a positive number by a non-zero integer**
-* Input: `divide(10, 2)`
-* Expected Output: `5`
-* Test Result: Pass
-
-These test cases cover various scenarios to ensure that the `Calculator` class is working correctly. Note that you may want to add more test cases depending on your specific requirements and testing goals.
+These test cases should cover some of the basic scenarios and edge cases for the Calculator class.
