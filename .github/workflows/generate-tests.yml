@@ -62,3 +62,4 @@ jobs:
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
           else
             echo "⚠️ No new test cases to commit"
+          fi 
