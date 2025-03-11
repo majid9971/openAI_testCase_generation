@@ -1,4 +1,4 @@
-name: Generate Test Cases
+name: Generate  Test Cases
 
 on:
   push:
