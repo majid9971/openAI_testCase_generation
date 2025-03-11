@@ -1,26 +1,27 @@
 import os
-import openai
+import litellm
 
 # Load API key from environment variable
-client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Function to generate test cases using OpenAI API
+# Function to generate test cases using LiteLLM (OpenAI Compatible)
 def generate_test_code(source_code, language):
     prompt = f"Generate test cases for the following {language} code:\n\n{source_code}"
 
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}]
+    response = litellm.completion(
+        model="gpt-3.5-turbo",  # Free model available through LiteLLM
+        messages=[{"role": "user", "content": prompt}],
+        api_key=API_KEY  # LiteLLM proxy key (if needed)
     )
 
-    return response.choices[0].message.content
+    return response['choices'][0]['message']['content']
 
 # Main function to scan and generate tests
 def scan_and_generate_tests():
-    SRC_DIR = "src/"  # Fix the path to the correct source directory
+    SRC_DIR = "openAI_testCase_generation/src/"
     
     found_files = False
-    
+
     for root, _, files in os.walk(SRC_DIR):
         for file in files:
             if file.endswith((".java", ".js", ".py")):
