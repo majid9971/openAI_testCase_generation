@@ -18,7 +18,7 @@ def generate_test_code(source_code, language):
     response = requests.post(OLLAMA_URL, json=payload)
     
     if response.status_code != 200:
-        raise Exception(f"Failed to generate test cases: {response.text}")
+        raise Exception(f"Failed t o generate test cases: {response.text}")
 
     result = response.json().get('response')
     return result
