@@ -33,6 +33,9 @@ jobs:
             echo "✅ OpenAI API Key is set."
           fi
 
+      - name: Create Test Directory (if not exists)
+        run: mkdir -p openAI_testCase_generation/src/test/
+
       - name: Run Test Case Generation Script
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -44,7 +47,12 @@ jobs:
           ls -R openAI_testCase_generation/src/test/ || echo "❌ No test cases generated"
 
       - name: Set File Permissions
-        run: chmod -R 755 openAI_testCase_generation/src/test/
+        run: |
+          if [ -d "openAI_testCase_generation/src/test/" ]; then
+            chmod -R 755 openAI_testCase_generation/src/test/
+          else
+            echo "⚠️ No test cases found to set permissions"
+          fi
 
       - name: Upload Generated Test Cases as Artifact
         if: success() && hashFiles('openAI_testCase_generation/src/test/*') != ''
@@ -63,4 +71,3 @@ jobs:
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/shadabmalikshah/openAI_testCase_generation.git
           else
             echo "⚠️ No new test cases to commit"
-          fi
